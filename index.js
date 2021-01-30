@@ -156,11 +156,12 @@ function drawHelp() {
     context.fillStyle = 'black';
     context.font = '20px Arial';
     context.textAlign = 'center';
-    context.fillText('C A M P O    D E    T I R O', centerX, centerY - height * 3);
-    context.fillText('Clique em qualquer lugar para começar o treino.', centerX, centerY - height);
-    context.fillText('Você deve clicar em cada alvo o mais rápido possível.', centerX, centerY);
+    context.fillText('C A M P O    D E    T I R O', centerX, centerY - height * 4);
+    context.fillText('Clique em qualquer lugar para começar o treino.', centerX, centerY - height * 2);
+    context.fillText('Você deve clicar em cada alvo o mais rápido possível.', centerX, centerY - height);
     context.fillText('Pressione ESPAÇO a qualquer momento para pausar.', centerX, centerY + height);
-    context.fillText('Pressione - ou = para ajustar o tempo por alvo.', centerX, centerY + height * 3);
+    context.fillText('Pressione - ou = para ajustar o tempo por alvo.', centerX, centerY + height * 2);
+    context.fillText('Pressione R para recomeçar.', centerX, centerY + height * 3);
 }
 function playSound(sounds) {
     if (sounds.length === 0) {
@@ -231,7 +232,7 @@ function pressKey(event) {
                 playPauseSound();
             }
             else {
-                resetStats();
+                // resetStats()
                 playUnpauseSound();
             }
             nextGoal();
@@ -252,6 +253,18 @@ function pressKey(event) {
             }
             goalTime += 100;
             protectionTime = goalTime <= 600 ? 100 : 250;
+            nextGoal();
+            break;
+        }
+        case 'r': {
+            if (!paused) {
+                playPauseSound();
+            }
+            paused = true;
+            missedLast = false;
+            clearTimeout(missTask);
+            clearTimeout(protectTask);
+            resetStats();
             nextGoal();
             break;
         }
