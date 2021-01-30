@@ -2,7 +2,7 @@
 var _a;
 var canvas = document.querySelector('#screen');
 var context = canvas.getContext('2d'); // TODO: Raise error if unsupported.
-var radii = [10, 50, 100];
+var radii = [10, 35, 80];
 var points = [10, 5, 1];
 var innerColor = 'red';
 var outerColor = 'yellow';
@@ -117,22 +117,26 @@ function drawGoal() {
     }
 }
 function drawStatus() {
+    var _a;
     var left = 5;
     var bottom = canvas.height - 5;
     var height = 18;
     var rounds = hits + misses;
-    var accuracy = Math.round(10 * 100 * hits / rounds) / 10;
+    var accuracy = Math.floor(10 * 100 * hits / rounds) / 10;
     var performance = Math.floor(1000 * score / rounds) / 1000;
+    var perfMult = Math.floor(10 * 100 * performance / ((_a = points[0]) !== null && _a !== void 0 ? _a : 1)) / 10;
+    var headMult = Math.floor(10 * 100 * headshots / hits) / 10;
     context.fillStyle = 'black';
     context.font = '18px Arial';
     context.textAlign = 'left';
-    context.fillText("Acertos: " + hits, left, bottom - height * 6);
-    context.fillText("Erros: " + misses, left, bottom - height * 5);
-    context.fillText("Rounds: " + rounds, left, bottom - height * 4);
-    context.fillText("Certeiros: " + headshots, left, bottom - height * 3);
-    context.fillText("Precis\u00E3o: " + accuracy + "%", left, bottom - height * 2);
-    context.fillText("Pontua\u00E7\u00E3o: " + score, left, bottom - height * 1);
-    context.fillText("Performance: " + performance + " /round", left, bottom - height * 0);
+    context.fillText("Acertos: " + hits, left, bottom - height * 7);
+    context.fillText("Erros: " + misses, left, bottom - height * 6);
+    context.fillText("Rounds: " + rounds, left, bottom - height * 5);
+    context.fillText("Pontua\u00E7\u00E3o: " + score, left, bottom - height * 4);
+    context.fillText("Precis\u00E3o: " + accuracy + "%", left, bottom - height * 3);
+    context.fillText("Certeiros: " + headshots, left, bottom - height * 2);
+    context.fillText("Taxa certeiro: " + headMult + "%", left, bottom - height * 1);
+    context.fillText("Performance: " + perfMult + "%", left, bottom - height * 0);
 }
 function drawParameters() {
     var right = canvas.width - 5;
@@ -154,7 +158,7 @@ function drawHelp() {
     var centerY = canvas.height / 2;
     var height = 30;
     context.fillStyle = 'black';
-    context.font = '20px Arial';
+    context.font = '22px Arial';
     context.textAlign = 'center';
     context.fillText('C A M P O    D E    T I R O', centerX, centerY - height * 4);
     context.fillText('Clique em qualquer lugar para começar o treino.', centerX, centerY - height * 2);

@@ -1,7 +1,7 @@
 const canvas = document.querySelector('#screen') as HTMLCanvasElement
 const context = canvas.getContext('2d')!  // TODO: Raise error if unsupported.
 
-const radii = [10, 50, 100]
+const radii = [10, 35, 80]
 const points = [10, 5, 1]
 const innerColor = 'red'
 const outerColor = 'yellow'
@@ -144,22 +144,25 @@ function drawStatus(): void {
     const height = 18
 
     const rounds = hits + misses
-    const accuracy = Math.round(10 * 100 * hits / rounds) / 10
+    const accuracy = Math.floor(10 * 100 * hits / rounds) / 10
     const performance = Math.floor(1000 * score / rounds) / 1000
+    const perfMult = Math.floor(10 * 100 * performance / (points[0] ?? 1)) / 10
+    const headMult = Math.floor(10 * 100 * headshots / hits) / 10
 
     context.fillStyle = 'black'
     context.font = '18px Arial'
     context.textAlign = 'left'
 
-    context.fillText(`Acertos: ${hits}`, left, bottom - height * 6)
-    context.fillText(`Erros: ${misses}`, left, bottom - height * 5)
-    context.fillText(`Rounds: ${rounds}`, left, bottom - height * 4)
+    context.fillText(`Acertos: ${hits}`, left, bottom - height * 7)
+    context.fillText(`Erros: ${misses}`, left, bottom - height * 6)
+    context.fillText(`Rounds: ${rounds}`, left, bottom - height * 5)
+    context.fillText(`Pontuação: ${score}`, left, bottom - height * 4)
 
-    context.fillText(`Certeiros: ${headshots}`, left, bottom - height * 3)
-    context.fillText(`Precisão: ${accuracy}%`, left, bottom - height * 2)
+    context.fillText(`Precisão: ${accuracy}%`, left, bottom - height * 3)
+    context.fillText(`Certeiros: ${headshots}`, left, bottom - height * 2)
+    context.fillText(`Taxa certeiro: ${headMult}%`, left, bottom - height * 1)
 
-    context.fillText(`Pontuação: ${score}`, left, bottom - height * 1)
-    context.fillText(`Performance: ${performance} /round`, left, bottom - height * 0)
+    context.fillText(`Performance: ${perfMult}%`, left, bottom - height * 0)
 }
 
 function drawParameters(): void {
@@ -189,7 +192,7 @@ function drawHelp(): void {
     const height = 30
 
     context.fillStyle = 'black'
-    context.font = '20px Arial'
+    context.font = '22px Arial'
     context.textAlign = 'center'
 
     context.fillText('C A M P O    D E    T I R O', centerX, centerY - height * 4)
