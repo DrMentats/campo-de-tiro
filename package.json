@@ -1,14 +1,14 @@
 {
   "name": "firingrange",
-  "version": "0.0.1",
+  "version": "0.2.0",
   "author": "DrMentats <lord.storyteller@gmail.com>",
   "license": "MIT",
   "private": true,
   "devDependencies": {
-    "typescript": "^4.1.3"
+    "typescript": "^4.1.3",
+    "@types/tinycolor2": "^1.4.2"
   },
   "dependencies": {
-    "@types/tinycolor2": "^1.4.2",
     "tinycolor2": "^1.4.2"
   }
 }

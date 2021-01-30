@@ -1,11 +1,24 @@
 const canvas = document.querySelector('#screen') as HTMLCanvasElement
-const context = canvas.getContext('2d')!  // TODO
+const context = canvas.getContext('2d')!  // TODO: Raise error if unsupported.
 
 const radii = [10, 50, 100]
 const points = [10, 5, 1]
 const innerColor = 'red'
 const outerColor = 'yellow'
-const screenMargin = radii[radii.length - 1]
+const screenMargin = radii[radii.length - 1] ?? 100
+
+const hitSounds = [
+    new Audio('audio/hit1.ogg'),
+    new Audio('audio/hit2.ogg'),
+    new Audio('audio/hit3.ogg'),
+]
+
+const missSounds = [
+    new Audio('audio/miss1.ogg'),
+    new Audio('audio/miss2.ogg'),
+    new Audio('audio/miss3.ogg'),
+    new Audio('audio/miss4.ogg'),
+]
 
 // State
 let goalX = 0
@@ -20,7 +33,7 @@ let protectTask = -1
 
 // Parameters
 let goalTime = 1000
-let protectionTime = 200
+let protectionTime = 250
 
 // Statistics
 let hits = 0
@@ -104,7 +117,7 @@ function resetStats(): void {
 
 function drawGoal(): void {
     for (let index = radii.length - 1; index >= 0; --index) {
-        const radius = radii[index]
+        const radius = radii[index]!
 
         context.beginPath()
         context.arc(goalX, goalY, radius, 0, Math.PI * 2)
@@ -175,6 +188,24 @@ function drawHelp(): void {
     context.fillText('Pressione - ou = para ajustar o tempo por alvo.', centerX, centerY + height * 3)
 }
 
+function playSound(sounds: HTMLAudioElement[]): void {
+    if (sounds.length === 0) {
+        return
+    }
+    const audio = sounds[Math.floor(Math.random() * sounds.length)]!
+    audio.pause()
+    audio.currentTime = 0
+    audio.play()
+}
+
+function playHitSound(): void {
+    playSound(hitSounds)
+}
+
+function playMissSound(): void {
+    playSound(missSounds)
+}
+
 function clickCanvas(event: MouseEvent): void {
     const clickX = event.clientX
     const clickY = event.clientY
@@ -187,22 +218,25 @@ function clickCanvas(event: MouseEvent): void {
         missedLast = true
 
         for (let index = 0; index < radii.length; index++) {
-            const radius = radii[index]
+            const radius = radii[index]!
             if (distance < radius) {
                 ++hits
-                score += points[index]
+                score += points[index] ?? 1
                 missedLast = false
                 break
             }
         }
         if (missedLast) {
             if (protect) {
+                playMissSound()  // FIXME
                 return
             }
             ++misses
+            playMissSound()
         }
-        if (radii.length > 1 && distance < radii[0]) {
+        if (radii.length > 1 && distance < radii[0]!) {
             ++headshots
+            playHitSound()
         }
     }
 
@@ -235,7 +269,7 @@ function pressKey(event: KeyboardEvent): void {
                 return
             }
             goalTime -= 100
-            protectionTime = goalTime <= 600 ? 100 : 200
+            protectionTime = goalTime <= 600 ? 100 : 250
             nextGoal()
             break
         }
@@ -245,7 +279,7 @@ function pressKey(event: KeyboardEvent): void {
                 return
             }
             goalTime += 100
-            protectionTime = goalTime <= 600 ? 100 : 200
+            protectionTime = goalTime <= 600 ? 100 : 250
             nextGoal()
             break
         }

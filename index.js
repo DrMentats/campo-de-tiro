@@ -1,11 +1,23 @@
 "use strict";
+var _a;
 var canvas = document.querySelector('#screen');
-var context = canvas.getContext('2d'); // TODO
+var context = canvas.getContext('2d'); // TODO: Raise error if unsupported.
 var radii = [10, 50, 100];
 var points = [10, 5, 1];
 var innerColor = 'red';
 var outerColor = 'yellow';
-var screenMargin = radii[radii.length - 1];
+var screenMargin = (_a = radii[radii.length - 1]) !== null && _a !== void 0 ? _a : 100;
+var hitSounds = [
+    new Audio('audio/hit1.ogg'),
+    new Audio('audio/hit2.ogg'),
+    new Audio('audio/hit3.ogg'),
+];
+var missSounds = [
+    new Audio('audio/miss1.ogg'),
+    new Audio('audio/miss2.ogg'),
+    new Audio('audio/miss3.ogg'),
+    new Audio('audio/miss4.ogg'),
+];
 // State
 var goalX = 0;
 var goalY = 0;
@@ -17,7 +29,7 @@ var missTask = -1;
 var protectTask = -1;
 // Parameters
 var goalTime = 1000;
-var protectionTime = 200;
+var protectionTime = 250;
 // Statistics
 var hits = 0;
 var misses = 0;
@@ -46,7 +58,7 @@ function updateCanvasSize() {
     nextGoal();
 }
 function clearScreen() {
-    context.fillStyle = missedLast ? '#ffbbbb' : '#ddffdd'; // mistyrose
+    context.fillStyle = missedLast ? '#ffcccc' : '#ddffdd';
     context.fillRect(0, 0, canvas.width, canvas.height);
 }
 function randomizeGoal() {
@@ -141,7 +153,23 @@ function drawHelp() {
     context.fillText('Pressione ESPAÇO a qualquer momento para pausar.', centerX, centerY + height);
     context.fillText('Pressione - ou = para ajustar o tempo por alvo.', centerX, centerY + height * 3);
 }
+function playSound(sounds) {
+    if (sounds.length === 0) {
+        return;
+    }
+    var audio = sounds[Math.floor(Math.random() * sounds.length)];
+    audio.pause();
+    audio.currentTime = 0;
+    audio.play();
+}
+function playHitSound() {
+    playSound(hitSounds);
+}
+function playMissSound() {
+    playSound(missSounds);
+}
 function clickCanvas(event) {
+    var _a;
     var clickX = event.clientX;
     var clickY = event.clientY;
     var deltaX = clickX - goalX;
@@ -153,19 +181,22 @@ function clickCanvas(event) {
             var radius = radii[index];
             if (distance < radius) {
                 ++hits;
-                score += points[index];
+                score += (_a = points[index]) !== null && _a !== void 0 ? _a : 1;
                 missedLast = false;
                 break;
             }
         }
         if (missedLast) {
             if (protect) {
+                playMissSound(); // FIXME
                 return;
             }
             ++misses;
+            playMissSound();
         }
         if (radii.length > 1 && distance < radii[0]) {
             ++headshots;
+            playHitSound();
         }
     }
     paused = false;
@@ -191,7 +222,7 @@ function pressKey(event) {
                 return;
             }
             goalTime -= 100;
-            protectionTime = goalTime <= 600 ? 100 : 200;
+            protectionTime = goalTime <= 600 ? 100 : 250;
             nextGoal();
             break;
         }
@@ -200,7 +231,7 @@ function pressKey(event) {
                 return;
             }
             goalTime += 100;
-            protectionTime = goalTime <= 600 ? 100 : 200;
+            protectionTime = goalTime <= 600 ? 100 : 250;
             nextGoal();
             break;
         }
