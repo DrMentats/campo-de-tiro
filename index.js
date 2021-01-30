@@ -17,6 +17,15 @@ var missSounds = [
     new Audio('audio/miss2.ogg'),
     new Audio('audio/miss3.ogg'),
     new Audio('audio/miss4.ogg'),
+    new Audio('audio/miss5.ogg'),
+];
+var pauseSounds = [
+    new Audio('audio/pause1.ogg'),
+];
+var unpauseSounds = [
+    new Audio('audio/unpause1.ogg'),
+    new Audio('audio/unpause2.ogg'),
+    new Audio('audio/unpause3.ogg'),
 ];
 // State
 var goalX = 0;
@@ -168,6 +177,12 @@ function playHitSound() {
 function playMissSound() {
     playSound(missSounds);
 }
+function playPauseSound() {
+    playSound(pauseSounds);
+}
+function playUnpauseSound() {
+    playSound(unpauseSounds);
+}
 function clickCanvas(event) {
     var _a;
     var clickX = event.clientX;
@@ -175,7 +190,11 @@ function clickCanvas(event) {
     var deltaX = clickX - goalX;
     var deltaY = clickY - goalY;
     var distance = Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2));
-    if (!paused) {
+    if (paused) {
+        paused = false;
+        playUnpauseSound();
+    }
+    else {
         missedLast = true;
         for (var index = 0; index < radii.length; index++) {
             var radius = radii[index];
@@ -199,7 +218,6 @@ function clickCanvas(event) {
             playHitSound();
         }
     }
-    paused = false;
     nextGoal();
 }
 function pressKey(event) {
@@ -210,9 +228,11 @@ function pressKey(event) {
                 missedLast = false;
                 clearTimeout(missTask);
                 clearTimeout(protectTask);
+                playPauseSound();
             }
             else {
                 resetStats();
+                playUnpauseSound();
             }
             nextGoal();
             break;

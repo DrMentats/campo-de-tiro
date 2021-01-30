@@ -18,6 +18,17 @@ const missSounds = [
     new Audio('audio/miss2.ogg'),
     new Audio('audio/miss3.ogg'),
     new Audio('audio/miss4.ogg'),
+    new Audio('audio/miss5.ogg'),
+]
+
+const pauseSounds = [
+    new Audio('audio/pause1.ogg'),
+]
+
+const unpauseSounds = [
+    new Audio('audio/unpause1.ogg'),
+    new Audio('audio/unpause2.ogg'),
+    new Audio('audio/unpause3.ogg'),
 ]
 
 // State
@@ -206,6 +217,14 @@ function playMissSound(): void {
     playSound(missSounds)
 }
 
+function playPauseSound(): void {
+    playSound(pauseSounds)
+}
+
+function playUnpauseSound(): void {
+    playSound(unpauseSounds)
+}
+
 function clickCanvas(event: MouseEvent): void {
     const clickX = event.clientX
     const clickY = event.clientY
@@ -214,7 +233,10 @@ function clickCanvas(event: MouseEvent): void {
     const deltaY = clickY - goalY
     const distance = Math.sqrt(deltaX ** 2 + deltaY ** 2)
 
-    if (!paused) {
+    if (paused) {
+        paused = false
+        playUnpauseSound()
+    } else {
         missedLast = true
 
         for (let index = 0; index < radii.length; index++) {
@@ -240,8 +262,6 @@ function clickCanvas(event: MouseEvent): void {
         }
     }
 
-    paused = false
-
     nextGoal()
 }
 
@@ -255,8 +275,12 @@ function pressKey(event: KeyboardEvent): void {
 
                 clearTimeout(missTask)
                 clearTimeout(protectTask)
+
+                playPauseSound()
             } else {
                 resetStats()
+
+                playUnpauseSound()
             }
 
             nextGoal()
